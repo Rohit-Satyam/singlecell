@@ -85,4 +85,4 @@ Demultiplexed FASTQ files with valid sequencing indices are found under the dire
 1. https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_fq
 2. Obsolete tutorial still informative: https://bioinformatics.uconn.edu/single-cell-rna-sequencing-cell-ranger-2/#LibPrep
 3. Broad Institute tutorial: https://broadinstitute.github.io/2019_scWorkshop/data-preprocessing.html
-4. 
+4. https://davetang.org/muse/2018/08/09/getting-started-with-cell-ranger/
