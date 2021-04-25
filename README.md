@@ -67,6 +67,8 @@ Demultiplexed FASTQ files with valid sequencing indices are found under the dire
 
 ![enter image description here](https://i.imgur.com/YuMcUUr.png)
 
+>FastQ is the most raw form of scRNASeq data you will encounter. All scRNASeq protocols are sequenced with paired-end sequencing. Barcode sequences may occur in one or both reads depending on the protocol employed. However, protocols using unique molecular identifiers (UMIs) will generally contain one read with the cell and UMI barcodes plus adapters but without any transcript sequence. Thus reads will be mapped as if they are single-end sequenced despite actually being paired end.
+
 
 
 
