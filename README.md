@@ -22,32 +22,12 @@ To run `mkfastq pipeline`, an Illumina Experiment Manager (IEM) sample sheet is 
 wget http://cf.10xgenomics.com/supp/cell-exp/cellranger-tiny-bcl-samplesheet-1.2.0.csv
 ```
 The samplesheet looks like:
+```bash
+Lane,Sample,Index
+1,test_sample,SI-P03-C9
+```
 
-| \[Header\]        |                    |              |               |              |               |       |                 |             |
-| ----------------- | ------------------ | ------------ | ------------- | ------------ | ------------- | ----- | --------------- | ----------- |
-| IEMFileVersion    | 4                  |              |               |              |               |       |                 |             |
-| Investigator Name | rjr                |              |               |              |               |       |                 |             |
-| Experiment Name   | hiseq\_test        |              |               |              |               |       |                 |
-| Date              | ########           |              |               |              |               |       |                 |             |
-| Workflow          | GenerateFASTQ      |              |               |              |               |       |                 |
-| Application       | HiSeq FASTQ Only   |              |               |              |               |       |                 |
-| Assay             | TruSeq HT          |              |               |              |               |       |                 |
-| Description       | hiseq sample sheet |              |               |              |               |       |                 |
-| Chemistry         | Default            |              |               |              |               |       |                 |             |
-|                   |                    |              |               |              |               |       |                 |             |
-| \[Reads\]         |                    |              |               |              |               |       |                 |             |
-| 26                |                    |              |               |              |               |       |                 |             |
-| 98                |                    |              |               |              |               |       |                 |             |
-|                   |                    |              |               |              |               |       |                 |             |
-| \[Settings\]      |                    |              |               |              |               |       |                 |
-|                   |                    |              |               |              |               |       |                 |             |
-| \[Data\]          |                    |              |               |              |               |       |                 |             |
-| Lane              | Sample\_ID         | Sample\_Name | Sample\_Plate | Sample\_Well | I7\_Index\_ID | index | Sample\_Project | Description |
-| 1                 | s1                 | test\_sample |               | SI-P03-C9    | SI-P03-C9     | p1    |                 |
-
-It is a sample sheet that in the `Illumina Experiment Manager (IEM)` format. Note that you can specify a 10x sample index set in the index column of the `Data` section. cellranger `mkfastq` also supports oligo sequences in the index column. In this example, only reads from `lane 1` will be used. To search for the given sample index across all lanes, omit the lanes column entirely. 
-
-We run Cellranger to generate FASTQs. Option `--run` specifies path to the unzipped BCL file you want to demultiplex. Option `--samplesheet` specifies path sample sheet, `cellranger-tiny-bcl-samplesheet-1.2.0.csv` in this case.
+This file tells the pipeline that the library "test_sample" was sequenced on lane 1 of the flow cell and indexed using the SI-P03-C9 index set. The Sample column is used as the prefix for naming output files. This prefix also serves as the sample id in later Cell Ranger pipelines. In this case the prefix/sample id is test_sample.
 
 ```bash
 ## Install the bcl2fq first.This will be used to write fast files. Switch to this environment.
@@ -63,6 +43,44 @@ conda activate bcl2fastq
 
 Running `mkfastq`
 
+There are three  _arguments_  or inputs that are added to the  cellranger mkfastq  command:  `–-id`,  `--run`, and  `--csv`.
+
+The  `--id`  can be anything. It is used by the pipeline to name the output directory that Cell Ranger is going to create to run in. This directory is called a  _pipestance_, which is short for pipeline instance.
+
+The  `--run`  argument points to the Illumina run folder that contains the BCL files.
+
+The  `--csv`  argument is a comma-separated values (CSV) file that describes how samples were indexed on the Illumina flow cell.
+
 ```bash
-cellranger mkfastq --run=/home/pichkari/rohit/tools/cellranger-tiny-bcl-1.2.0 --samplesheet=/home/pichkari/rohit/tools/cellranger-tiny-bcl-samplesheet-1.2.0.csv
+cellranger mkfastq --id=tutorial_walk_through \
+--run=/home/pichkari/rohit/tools/cellranger-tiny-bcl-1.2.0 \
+--csv=/home/pichkari/rohit/tools/cellranger-tiny-bcl-simple-1.2.0.csv
 ```
+Run times vary based on the system resources, but it shouldn’t take more than a few minutes. Now go to the fastq_path directory.
+
+```bash
+H35KCBCXY  Reports  Stats  Undetermined_S0_L001_I1_001.fastq.gz  Undetermined_S0_L001_R1_001.fastq.gz  Undetermined_S0_L001_R2_001.fastq.gz
+```
+The Undetermined FASTQ files here at this level contain sequences that were unable to be assigned to valid index.
+
+Demultiplexed FASTQ files with valid sequencing indices are found under the directory named after the flow cell id, in this case 'H35KCBCXY'.
+
+![enter image description here](https://i.imgur.com/YuMcUUr.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+### References
+1. https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/tutorial_fq
+2. Obsolete tutorial still informative: https://bioinformatics.uconn.edu/single-cell-rna-sequencing-cell-ranger-2/#LibPrep
+3. Broad Institute tutorial: https://broadinstitute.github.io/2019_scWorkshop/data-preprocessing.html
+4. 
