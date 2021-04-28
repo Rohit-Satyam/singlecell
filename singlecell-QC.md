@@ -54,7 +54,7 @@ p40R_sce <- p40R_sce[keep_feature, ] #dim: 5363 6794880
 
 ## Re-lable the row names for readability. In case of Plasmodium the ID and Symbol column have same entry so it can be skipped: rownames(sce) <- uniquifyFeatureNames(rowData(sce)$ID, rowData(sce)$Symbol). Use for human data.
 ```
-## Calling for empty cells (Columns)
+## Diagnosing for empty cells (Columns)
 This is not entirely straightforward as empty droplets can contain ambient (i.e., extracellular) RNA that can be captured and sequenced. 
 The waterfall plot shows the log-count against the log-rank of each barcode.The barcodes are ranked based on the number of count each barcode has.
 We will compute these statistics using the `barcodeRanks` function from the `DropletUtils` package. And then we will extra the statistics and perform some plotting using the ggplot2 package.
@@ -109,12 +109,12 @@ plot_waterfall(bcrank,"p40R_sce")
 bcrank <- barcodeRanks(counts(p40D_sce))
 plot_waterfall(bcrank,"p40D_sce")
 ```
+## Removing low quality cells
 
+the emptyDroplets (cells/columns)
 
-## This gives us total UMI count for each barcode in the PBMC dataset, plotted against its rank (in decreasing order of total counts)
-
-## emptyDrops() function to test whether the expression profile for each cell barcode is significantly different from the ambient RNA pool.
-
+`emptyDrops()` function to test whether the expression profile for each cell barcode is significantly different from the ambient RNA pool.
+```r
 set.seed(100)
 e.out <- emptyDrops(counts(sce))
 is.cell <- sum(e.out$FDR <= 0.001, na.rm=TRUE)
