@@ -4,6 +4,8 @@
 suppressMessages(library("DropletUtils"))
 suppressMessages(library(scater))
 suppressMessages(library(SummarizedExperiment))
+library(ggplot2)
+library(scales)
 ```
 ## Setting up the data
 We load in the raw count matrix using the `read10xCounts()` function from the _[DropletUtils](https://bioconductor.org/packages/3.10/DropletUtils)_ package. This will create a `SingleCellExperiment` object where each column corresponds to a cell barcode.
@@ -22,7 +24,7 @@ p40R_sce <- read10xCounts(p40R, col.names=TRUE) #dim: 39250 6794880
 
 #head(rowData(p16D_sce))
 ```
-## Filtering
+## Filtering for genes (Rows)
 > Since the data contains both human and plasmodium genes, we will remove human genes because RBC got no organelle or DNA. Also we will remove genes that are not expressed in any cell: 
 ```r
 name <- rownames(p16D_sce)
@@ -49,21 +51,39 @@ p40D_sce <- p40D_sce[keep_feature, ] #dim: 5405 6794880
 
 keep_feature <- rowSums(counts(p40R_sce) > 0) > 0
 p40R_sce <- p40R_sce[keep_feature, ] #dim: 5363 6794880
-```
 
 ## Re-lable the row names for readability. In case of Plasmodium the ID and Symbol column have same entry so it can be skipped: rownames(sce) <- uniquifyFeatureNames(rowData(sce)$ID, rowData(sce)$Symbol). Use for human data.
 ```
-## Calling for empty cells
+## Calling for empty cells (Columns)
+This is not entirely straightforward as empty droplets can contain ambient (i.e., extracellular) RNA that can be captured and sequenced. 
+The waterfall plot shows the log-count against the log-rank of each barcode.The barcodes are ranked based on the number of count each barcode has.
+We will compute these statistics using the `barcodeRanks` function from the `DropletUtils` package. And then we will extra the statistics and perform some plotting using the ggplot2 package.
 
-```{r, eval=FALSE}
-bcrank <- barcodeRanks(counts(sce))
-plot(bcrank$rank, bcrank$total, log="xy", xlab="Rank", ylab="Total UMI count", cex.lab=1.2)
 
-abline(h=metadata(bcrank)$inflection, col="darkgreen", lty=2)
-abline(h=metadata(bcrank)$knee, col="dodgerblue", lty=2)
+```r       
+bcrank <- barcodeRanks(counts(p40R_sce))
 
-legend("bottomleft", legend=c("Inflection", "Knee"), 
-    col=c("darkgreen", "dodgerblue"), lty=2, cex=1.2)
+
+plot_waterfall <- function (bcrank){ 
+barcode_data = as.data.frame(bcrank)
+barcode_points = data.frame(
+  type = c("inflection", "knee"),
+  value = c(bcrank@metadata$inflection, bcrank@metadata$knee))
+
+
+ggplot(data = barcode_data, aes(x = rank, y = total)) +
+  geom_point() +
+  geom_hline(data = barcode_points,
+             aes(yintercept = value,
+                 colour = type), linetype = 2) +
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+                labels = trans_format("log10", math_format(10^.x))) +
+  scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+                labels = trans_format("log10", math_format(10^.x))) +
+  labs(title = "Waterfall plot of read counts (log)",
+       x = "Log Rank",
+       y = "Log counts")
+       }
 ## This gives us total UMI count for each barcode in the PBMC dataset, plotted against its rank (in decreasing order of total counts)
 
 ## emptyDrops() function to test whether the expression profile for each cell barcode is significantly different from the ambient RNA pool.
