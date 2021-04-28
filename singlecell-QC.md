@@ -94,7 +94,7 @@ The waterfall plots show two points of interest:
 - **knee point** is the point where the signed curvature is minimised <br>
 These two points potentially indicate `empty droplets` (background barcodes). To elaborate on this concept, it is helpful to know that for microfluidic sequencing systems each droplet contains a bead and each bead are marked uniquely with a barcode. Intuitively, we can consider a droplet and the barcode associated with it as being a unique cell. Due to the technology, however, sometimes the droplet don’t always contain a cell, or it might contain multiples cells. We can now use the waterfall plot to detect those empty droplets. The barcodes with the number of counts dropping rapidly beyond knee point may suggest empty reads.
 
-
+>High quality barcodes are located on the left hand side of the plot, and thresholding is performed by identifying the “knee” on the curve. On the right hand side, past the inflection point, are barcodes which have relatively low numbers of reads, and are therefore considered to have had failure in capture and to be too noisy for further analysis. [Source](https://liorpachter.wordpress.com/tag/knee-plot/#:~:text=A%20single%2Dcell%20RNA%2Dseq,%E2%80%9Cknee%E2%80%9D%20on%20the%20curve.)
 
 ```r
 bcrank <- barcodeRanks(counts(p16R_sce))
