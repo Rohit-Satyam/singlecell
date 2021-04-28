@@ -59,12 +59,13 @@ This is not entirely straightforward as empty droplets can contain ambient (i.e.
 The waterfall plot shows the log-count against the log-rank of each barcode.The barcodes are ranked based on the number of count each barcode has.
 We will compute these statistics using the `barcodeRanks` function from the `DropletUtils` package. And then we will extra the statistics and perform some plotting using the ggplot2 package.
 
+Here given is a waterfall plot function that ingests the bcrank object from `bcrank <- barcodeRanks(counts(p40R_sce))`
 
-```r       
-bcrank <- barcodeRanks(counts(p40R_sce))
+Usage:
+`plot_waterfall(bcrank,"p40R_sce")`
 
-
-plot_waterfall <- function (bcrank){ 
+```r  
+plot_waterfall <- function (bcrank, sample){ 
 barcode_data = as.data.frame(bcrank)
 barcode_points = data.frame(
   type = c("inflection", "knee"),
@@ -80,10 +81,36 @@ ggplot(data = barcode_data, aes(x = rank, y = total)) +
                 labels = trans_format("log10", math_format(10^.x))) +
   scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
                 labels = trans_format("log10", math_format(10^.x))) +
-  labs(title = "Waterfall plot of read counts (log)",
+  labs(title = paste0("Waterfall plot of read counts (log) for ", sample),
        x = "Log Rank",
-       y = "Log counts")
+       y = "Log counts")+theme_bw()+theme(axis.text.x = element_text(face="bold", color="black", size=12),axis.text.y = element_text(face="bold", color="black", size=12))
        }
+```
+Making Waterfall plot for all 4 samples:
+
+The waterfall plots show two points of interest:
+
+- **inflection** point is the point on the curve where the first derivative is minimised
+- **knee point** is the point where the signed curvature is minimised <br>
+These two points potentially indicate `empty droplets` (background barcodes). To elaborate on this concept, it is helpful to know that for microfluidic sequencing systems each droplet contains a bead and each bead are marked uniquely with a barcode. Intuitively, we can consider a droplet and the barcode associated with it as being a unique cell. Due to the technology, however, sometimes the droplet don’t always contain a cell, or it might contain multiples cells. We can now use the waterfall plot to detect those empty droplets. The barcodes with the number of counts dropping rapidly beyond knee point may suggest empty reads.
+
+
+
+```r
+bcrank <- barcodeRanks(counts(p16R_sce))
+plot_waterfall(bcrank,"p16R_sce")
+
+bcrank <- barcodeRanks(counts(p16D_sce))
+plot_waterfall(bcrank,"p16D_sce")
+
+bcrank <- barcodeRanks(counts(p40R_sce))
+plot_waterfall(bcrank,"p40R_sce")
+
+bcrank <- barcodeRanks(counts(p40D_sce))
+plot_waterfall(bcrank,"p40D_sce")
+```
+
+
 ## This gives us total UMI count for each barcode in the PBMC dataset, plotted against its rank (in decreasing order of total counts)
 
 ## emptyDrops() function to test whether the expression profile for each cell barcode is significantly different from the ambient RNA pool.
