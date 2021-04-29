@@ -1,11 +1,11 @@
 ## Steps for QCing single cell data
 
 ```r
-suppressMessages(library("DropletUtils"))
-suppressMessages(library(scater))
-suppressMessages(library(SummarizedExperiment))
+suppressPackageStartupMessages({library("DropletUtils")
+library(scater)
+library(SummarizedExperiment)
 library(ggplot2)
-library(scales)
+library(scales))}
 ```
 ## Setting up the data
 We load in the raw count matrix using the `read10xCounts()` function from the _[DropletUtils](https://bioconductor.org/packages/3.10/DropletUtils)_ package. This will create a `SingleCellExperiment` object where each column corresponds to a cell barcode.
