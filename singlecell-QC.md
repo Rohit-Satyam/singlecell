@@ -148,13 +148,20 @@ p40R_sce <- empty_filt(p40R_sce) #dim: 5363 3680
 ```
 
 ## Quality control on the cells
-
+The previous step only distinguishes cells from empty droplets, but makes no statement about the quality of the cells. It is entirely possible for droplets to contain damaged or dying cells, which need to be removed prior to downstream analysis. We compute some QC metrics using calculateQCMetrics()
 
 ```r
+add_qc <- function(sce){
 is.mito <- grep("mito", rownames(sce))
-#per.cell <- perCellQCMetrics(sce, subsets=list(Mito=is.mito))
 sce <- calculateQCMetrics(sce, feature_controls=list(Mito=is.mito))
-#summary(per.cell$sum)
+return(sce)}
+
+p16D_sce <- add_qc(p16D_sce) #dim: 5446 4269
+p16R_sce <- add_qc(p16R_sce) #dim: 5408 5212
+p40D_sce <- add_qc(p40D_sce) #dim: 5405 3946 
+p40R_sce <- add_qc(p40R_sce) #dim: 5363 3680 
+
+plot_hist <- function(sce){
 par(mfrow=c(1,3))
 hist(sce$log10_total_counts, breaks=20, col="grey80",
     xlab="Log-total UMI count")
@@ -162,12 +169,29 @@ hist(sce$log10_total_features_by_counts, breaks=20, col="grey80",
     xlab="Log-total number of expressed features")
 hist(sce$pct_counts_Mito, breaks=20, col="grey80",
     xlab="Proportion of reads in mitochondrial genes")
+}
 
-#using less stringent criteria to filter cells with higher mitochondrial genes.
+plot_hist(p16D_sce)
+plot_hist(p16R_sce)
+plot_hist(p40D_sce)
+plot_hist(p40R_sce)
+```
+Ideally, we would remove cells with low library sizes or total number of expressed features. However, this would likely remove cell types with low RNA content. Thus, we use a more relaxed strategy and only remove cells with large mitochondrial proportions, using it as a proxy for cell damage.
+
+```r
+mito_filter <- function(sce){
 high.mito <- isOutlier(sce$pct_counts_Mito, nmads=3, type="higher")
-sce <- sce[,!high.mito]
 summary(high.mito)
+sce <- sce[,!high.mito]
+return(sce)
+}
+p16D_sce <- mito_filter(p16D_sce) #dim: 5446 3498
+p16R_sce <- mito_filter(p16R_sce) #dim: 5408 4293
+p40D_sce <- mito_filter(p40D_sce) #dim: 5405 3733
+p40R_sce <- mito_filter(p40R_sce) #dim: 5363 3456
+```
 
+```
 ave <- calculateAverage(sce)
 rowData(sce)$AveCount <- ave
 hist(log10(ave), col="grey80")
@@ -175,3 +199,18 @@ hist(log10(ave), col="grey80")
 #most highly expressed genes is dominated
 plotHighestExprs(sce, n=25) + theme(text = element_text(size=14))
 ```
+
+## References
+
+1. https://bioconductor.org/packages/release/bioc/vignettes/scuttle/inst/doc/overview.html
+2. https://bioconductor.org/packages/release/bioc/vignettes/DropletUtils/inst/doc/DropletUtils.html
+3. https://kkorthauer.org/fungeno2019/singlecell/vignettes/1.2-preprocess-droplet.html
+4. https://bioconductor.org/packages/release/bioc/vignettes/scater/inst/doc/overview.html
+5. http://biocworkshops2019.bioconductor.org.s3-website-us-east-1.amazonaws.com/page/OSCABioc2019__OSCABioc2019/
+6. http://bioinformatics.age.mpg.de/presentations-tutorials/presentations/modules/single-cell//bioconductor_tutorial.html
+7. https://f1000research.com/articles/5-2122/v2
+8. https://scrnaseq-course.cog.sanger.ac.uk/website/cleaning-the-expression-matrix.html#expression-qc-reads
+9. https://almutlue.github.io/batch_dataset/pbmc_roche.html
+
+
+
