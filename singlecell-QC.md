@@ -34,7 +34,7 @@ name <- name[-hg]
 ## keep all the plasmodium genes
 sce <-sce[name,]
 
-p16D_sce <- p16D_sce[name,] #dim: 39250 6794880
+p16D_sce <- p16D_sce[name,]
 p16R_sce <- p16R_sce[name,]
 p40D_sce <- p40D_sce[name,]
 p40R_sce <- p40R_sce[name,]
@@ -86,6 +86,14 @@ ggplot(data = barcode_data, aes(x = rank, y = total)) +
        y = "Log counts")+theme_bw()+theme(axis.text.x = element_text(face="bold", color="black", size=12),axis.text.y = element_text(face="bold", color="black", size=12))
        }
 ```
+If you don't care about asthetics try this
+
+```r
+## Create the knee plot
+plot(log10(bcrank$rank), log10(bcrank$total))
+abline(h = log10(metadata(bcrank)$knee))
+```
+
 Making Waterfall plot for all 4 samples:
 
 The waterfall plots show two points of interest:
@@ -109,27 +117,40 @@ plot_waterfall(bcrank,"p40R_sce")
 bcrank <- barcodeRanks(counts(p40D_sce))
 plot_waterfall(bcrank,"p40D_sce")
 ```
-## Removing low quality cells
+## Removing empty Droplets
 
-the emptyDroplets (cells/columns)
+`emptyDrops()` function to test whether the expression profile for each cell barcode is significantly different from the ambient RNA pool. Shall you wish to adjust the number of cells to be retained, specify the `retain` parameter manually (default values computed by `emptyDrops` function can be seen by `metadata(e.out)$retain`). However, Aron Lun [recommends](https://support.bioconductor.org/p/118877/) to run it on defaults if you are not sure, what you are doing. 
 
-`emptyDrops()` function to test whether the expression profile for each cell barcode is significantly different from the ambient RNA pool.
+Barcodes that contain more than `retain` total counts are always retained.
+
 ```r
 set.seed(100)
-e.out <- emptyDrops(counts(sce))
+
+## making diagnostic plots. Droplets detected as cells should show up with large negative log-probabilities or very large total counts (based on the knee point reported by barcodeRanks.
+
+plot_diag <- function(sceobj){
+e.out <- emptyDrops(counts(sceobj))
 is.cell <- sum(e.out$FDR <= 0.001, na.rm=TRUE)
-
-## dim before filtering:dim: 5712 6794880 and after filtering dim: 5712 4255. Cross-checked with the filterred counts too iif same number of cells are rescued.
-
 plot(e.out$Total, -e.out$LogProb, col=ifelse(is.cell, "red", "black"),
      xlab="Total UMI count", ylab="-Log Probability")
-##Droplets detected as cells should show up with large negative log-probabilities or very large total counts (based on the knee point reported by barcodeRanks
+     }
+
+empty_filt <- function(sceobj){
+e.out <- emptyDrops(counts(sceobj))
+sceobj <- sceobj[,which(e.out$FDR <= 0.001)]
+return(sceobj)}
+
+p16D_sce <- empty_filt(p16D_sce) #dim: 5446 4269
+p16R_sce <- empty_filt(p16R_sce) #dim: 5408 5212
+p40D_sce <- empty_filt(p40D_sce) #dim: 5405 3946 
+p40R_sce <- empty_filt(p40R_sce) #dim: 5363 3680 
+
 ```
 
 ## Quality control on the cells
 
 
-```{r, eval=FALSE}
+```r
 is.mito <- grep("mito", rownames(sce))
 #per.cell <- perCellQCMetrics(sce, subsets=list(Mito=is.mito))
 sce <- calculateQCMetrics(sce, feature_controls=list(Mito=is.mito))
