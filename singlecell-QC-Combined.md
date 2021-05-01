@@ -19,5 +19,22 @@ sce$batch <- c(rep("16hpi",count),rep("16hpi",count),rep("40hpi",count),rep("40h
 colnames(sce) <- paste0(sce$batch, ".", sce$Barcode)
 #rownames(sce) <- paste0(rowData(sce)$ID, ".", rowData(sce)$Symbol)
 
-sce$batch <- factor(sce$batch)
+sce$batch <- factor(sce$batch) 
+dim(sce) #dim: 39250 27179520
 ```
+
+# Filtering
+```r
+keep_features <- rowSums(counts(sce) > 0) > 0
+sce <- sce[keep_features, ] #dim: 6900 27179520
+
+## Removing human genes
+name <- rownames(sce)
+hg <- grep("hg38", rownames(sce))
+name <- name[-hg]
+sce <-sce[name,]#dim: 5543 27179520
+```
+# Diagnosing for empty cells (Columns)
+
+
+
