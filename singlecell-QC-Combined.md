@@ -36,5 +36,43 @@ sce <-sce[name,]#dim: 5543 27179520
 ```
 # Diagnosing for empty cells (Columns)
 
+```r
+## Making quick QC plots
 
+bcrank <- barcodeRanks(counts(sce))
+plot_waterfall <- function (bcrank, sample){ 
+barcode_data = as.data.frame(bcrank)
+barcode_points = data.frame(
+  type = c("inflection", "knee"),
+  value = c(bcrank@metadata$inflection, bcrank@metadata$knee))
+  
+ggplot(data = barcode_data, aes(x = rank, y = total)) +
+  geom_point() +
+  geom_hline(data = barcode_points,
+             aes(yintercept = value,
+                 colour = type), linetype = 2) +
+  scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x),
+                labels = trans_format("log10", math_format(10^.x))) +
+  scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+                labels = trans_format("log10", math_format(10^.x))) +
+  labs(title = paste0("Waterfall plot of read counts (log) for ", sample),
+       x = "Log Rank",
+       y = "Log counts")+theme_bw()+theme(axis.text.x = element_text(face="bold", color="black", size=12),axis.text.y = element_text(face="bold", color="black", size=12))
+       }
+       
+       
+       plot_diag <- function(sceobj){
+e.out <- emptyDrops(counts(sceobj))
+is.cell <- sum(e.out$FDR <= 0.001, na.rm=TRUE)
+plot(e.out$Total, -e.out$LogProb, col=ifelse(is.cell, "red", "black"),
+     xlab="Total UMI count", ylab="-Log Probability")
+     }
+
+empty_filt <- function(sceobj){
+e.out <- emptyDrops(counts(sceobj))
+sceobj <- sceobj[,which(e.out$FDR <= 0.001)]
+return(sceobj)}
+
+```
+       
 
