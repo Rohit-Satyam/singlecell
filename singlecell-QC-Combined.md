@@ -89,5 +89,19 @@ table(sce$Sample)
 #4779 5961 4361 4126
 
 ```
+# Percell QC
+
+```r
+is.mito <- grep("mito", rownames(sce))
+sce <- addPerCellQC(sce, subsets=list(Mito=is.mito))
+
+hist(sce$subsets_Mito_percent, breaks=20, col="grey80",
+     xlab="Proportion of reads in mitochondrial genes")
+hist(sce$total, breaks=20, col="grey80",
+     xlab="Log-total number of counts for the cell (i.e., the library size)")
+     ave <- calculateAverage(sce)
+rowData(sce)$AveCount <- ave
+hist(log10(ave), col="grey80")
+```
        
 
