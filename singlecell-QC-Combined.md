@@ -73,6 +73,21 @@ e.out <- emptyDrops(counts(sceobj))
 sceobj <- sceobj[,which(e.out$FDR <= 0.001)]
 return(sceobj)}
 
+sce <- empty_filt(sce)
+dim(sce)
+
+#[1]  5543 19227
+
+table(sce$batch)
+
+#16hpi 40hpi 
+#10740  8487 
+
+table(sce$Sample)
+
+# 16D  16R  40D  40R 
+#4779 5961 4361 4126
+
 ```
        
 
