@@ -71,9 +71,8 @@ plot_waterfall <- function (bcrank, sample){
 barcode_data = as.data.frame(bcrank)
 barcode_points = data.frame(
   type = c("inflection", "knee"),
-  value = c(bcrank@metadata$inflection, bcrank@metadata$knee))}
-
-
+  value = c(bcrank@metadata$inflection, bcrank@metadata$knee))
+  
 ggplot(data = barcode_data, aes(x = rank, y = total)) +
   geom_point() +
   geom_hline(data = barcode_points,
