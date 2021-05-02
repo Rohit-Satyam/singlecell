@@ -1,3 +1,13 @@
+## Finding the Var genes:
+
+We downloaded the gff file from PlasmoDB v37
+
+```bash
+grep PfEMP1 PlasmoDB-37_Pfalciparum3D7.gff | awk '{print $9}' | sort -u | cut -f '2' -d'=' | cut -f '1' -d';' | cut -f '1' -d'.' | sort -u | wc -l > var_genes.csv
+```
+
+This gave us 105 var genes
+
 ## Converting Single Cell Experiment object to Seurat Object
 
 There is a direct method but that didn't work for me
@@ -39,7 +49,7 @@ plasmodium.combined <- RunPCA(plasmodium.combined, npcs = 30, verbose = FALSE)
 
 ### Running Harmony
 
-pf_hmony <- plasmodium.combined %>% RunHarmony("Sample", plot_convergence = TRUE)
+##pf_hmony <- plasmodium.combined %>% RunHarmony("Sample", plot_convergence = TRUE)
 
 
 
