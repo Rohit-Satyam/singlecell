@@ -115,5 +115,25 @@ table(clusters)
 sce <- computeSumFactors(sce, min.mean=0.1, cluster=clusters)
 summary(sizeFactors(sce))
 
+sce <- logNormCounts(sce)
+dec <- modelGeneVarByPoisson(sce)
+plot(dec$mean, dec$total, xlab="Mean log-expression", ylab="Variance")
+curve(metadata(dec)$trend(x), col="blue", add=TRUE)
+
+# Evaluate PCs
+sce2 <- denoisePCA(sce, subset.row = top.hvgs, technical = dec, BSPARAM=IrlbaParam())
+# make TSNE plot
+sce2 <- runTSNE(sce2, dimred = "PCA")
+# make UMAP plot
+sce2 <- runUMAP(sce2, dimred = "PCA")
+
+g <- buildSNNGraph(sce2, k = 10, use.dimred = "PCA")
+clust <- igraph::cluster_walktrap(g)$membership
+colLabels(sce2) <- factor(clust)
+# 
+colData(sce2)
+plotUMAP(sce2, colour_by = "label")
+
+
 ```
 
