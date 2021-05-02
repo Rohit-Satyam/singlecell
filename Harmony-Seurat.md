@@ -122,6 +122,44 @@ p3 <- DimPlot(plasmodium.combined, reduction = "umap", group.by = "batch")
 p1+p2+p3
 saveRDS(plasmodium.combined,"plasmodium.combined.with.mca.rds")
 var_genes <- read.csv("~/rohit/kaust_proj/var_gene.csv")
+
+# Finding common features
+r2 <- var_genes$V1
+r <- rownames(plasmodium.combined)
+common <- intersect(r,r2)
+
+#intersect(r,r2)
+ #[1] "PF3D7-1000100" "PF3D7-0632500" "PF3D7-0412400" "PF3D7-1240600" "PF3D7-0412700" "PF3D7-1240400"
+ #[7] "PF3D7-0712900" "PF3D7-1200600" "PF3D7-0712300" "PF3D7-0712000" "PF3D7-0421300" "PF3D7-0632800"
+#[13] "PF3D7-1240900" "PF3D7-0712800" "PF3D7-0800300" "PF3D7-0426000" "PF3D7-0900100" "PF3D7-0712600"
+#[19] "PF3D7-0223500" "PF3D7-0712400" "PF3D7-0420700" "PF3D7-1150400" "PF3D7-0711700" "PF3D7-1100200"
+#[25] "PF3D7-0600200" "PF3D7-1041300" "PF3D7-1219300" "PF3D7-0800200" "PF3D7-0937800" "PF3D7-1200400"
+#[31] "PF3D7-1240300" "PF3D7-0425800" "PF3D7-0421100" "PF3D7-0808700" "PF3D7-0808600" "PF3D7-1100100"
+#[37] "PF3D7-1373500" "PF3D7-0733000" "PF3D7-0300100" "PF3D7-0617400" "PF3D7-0115700" "PF3D7-1200100"
+#[43] "PF3D7-0809100" "PF3D7-0324900"
+
+FeaturePlot(object = plasmodium.combined, features = common[1:12],min.cutoff = "q9" )
+FeaturePlot(object = plasmodium.combined, features = common[13:24],min.cutoff = "q9" )
+FeaturePlot(object = plasmodium.combined, features = common[25:40],min.cutoff = "q9" )
+FeaturePlot(object = plasmodium.combined, features = common[41:47],min.cutoff = "q9" )
+
+t <- plasmodium.combined@assays$RNA[common,] ## 44 Var Genes
+
+t2 <- colSums(t)
+t2 <- Matrix::colSums(t)
+table(t2>0)
+
+#FALSE  TRUE 
+#11013 13613 
+
+#11013 cells that do not express any of 44 var genes.
+
+g <- t[,t2>0]
+m <- colSums(g)
+table(m>1)
+
+#FALSE  TRUE 
+ #88 13525 
 ```
 
 
