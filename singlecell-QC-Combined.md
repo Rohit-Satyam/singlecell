@@ -157,4 +157,6 @@ table(sce2$isDoublet)
 
 #   no   yes 
 #18259   968
+## Removing doublets.
+sce_clean <- sce2[,sce2$isDoublet == "no"]
 ```
