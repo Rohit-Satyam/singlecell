@@ -112,6 +112,8 @@ set.seed(1000)
 clusters <- quickCluster(sce, BSPARAM=IrlbaParam())
 table(clusters)
 
+sce <- computeSumFactors(sce, min.mean=0.1, cluster=clusters)
+summary(sizeFactors(sce))
 
 ```
 
