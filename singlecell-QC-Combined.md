@@ -133,7 +133,28 @@ colLabels(sce2) <- factor(clust)
 # 
 colData(sce2)
 plotUMAP(sce2, colour_by = "label")
+plotTSNE(sce2, colour_by = "label")
+top.dec <- subset(dec, rownames(dec) %in% top.hvgs)
+plotExpression(sce2, features=rownames(top.dec)[1:10])
 
-
+## Number of clusters can be seen by
+table(sce2$label)
 ```
 
+# Remove doublets
+
+```r
+dbl.dens <- scDblFinder::computeDoubletDensity(sce2,  d=ncol(reducedDim(sce2)),subset.row=top.hvgs)
+sce2$DoubletScore <- dbl.dens
+plotUMAP(sce2, colour_by = "DoubletScore")
+## In this analysis doublets are rare.
+
+#We can clean our data up based on this 95% quantile cut-off.
+plotColData(sce2, x = "label", y = "DoubletScore", colour_by = "label") + geom_hline(yintercept = quantile(colData(sce2)$DoubletScore, 0.95), lty = "dashed", color = "red")
+cut_off <- quantile(sce2$DoubletScore, 0.95)
+sce2$isDoublet <- c("no", "yes")[factor(as.integer(sce2$DoubletScore >= cut_off),levels = c(0, 1))]
+table(sce2$isDoublet)
+
+#   no   yes 
+#18259   968
+```
