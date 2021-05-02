@@ -119,7 +119,7 @@ sce <- logNormCounts(sce)
 dec <- modelGeneVarByPoisson(sce)
 plot(dec$mean, dec$total, xlab="Mean log-expression", ylab="Variance")
 curve(metadata(dec)$trend(x), col="blue", add=TRUE)
-
+top.hvgs <- getTopHVGs(dec, prop=0.1)
 # Evaluate PCs
 sce2 <- denoisePCA(sce, subset.row = top.hvgs, technical = dec, BSPARAM=IrlbaParam())
 # make TSNE plot
