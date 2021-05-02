@@ -103,5 +103,15 @@ hist(sce$total, breaks=20, col="grey80",
 rowData(sce)$AveCount <- ave
 hist(log10(ave), col="grey80")
 ```
-       
+# Normalising for cell Biases
+
+```r
+library(scran)
+library(BiocSingular)
+set.seed(1000)
+clusters <- quickCluster(sce, BSPARAM=IrlbaParam())
+table(clusters)
+
+
+```
 
