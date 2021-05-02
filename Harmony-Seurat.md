@@ -3,7 +3,7 @@
 We downloaded the gff file from PlasmoDB v37
 
 ```bash
-grep PfEMP1 PlasmoDB-37_Pfalciparum3D7.gff | awk '{print $9}' | sort -u | cut -f '2' -d'=' | cut -f '1' -d';' | cut -f '1' -d'.' | sort -u | wc -l > var_genes.csv
+grep PfEMP1 PlasmoDB-37_Pfalciparum3D7.gff | awk '{print $9}' | sort -u | cut -f '2' -d'=' | cut -f '1' -d';' | cut -f '1' -d'.' | sort -u > var_genes.csv
 ```
 
 This gave us 105 var genes
@@ -78,6 +78,8 @@ dat.m = read.csv("~/Desktop/Plasmodium_scRNAseq/malaria cell atlas data/pf10xIDC
 sobj.m <- CreateSeuratObject(counts = dat.m, project = "Malaria-Cell-Atlas", min.cells = 5, min.features = 100)
 sobj.m$condition = "malaria.atlas"
 sobj.m[["percent.mt"]] <- PercentageFeatureSet(object = sobj.m, pattern = "mito")
+sobj.m$Sample <- "mca"
+sobj.m$batch <- "MCA"
 
 ## Loading the sce_clean data obtained from preprocessed steps 
 counts <- assays(sce_clean)[[1]]
@@ -118,6 +120,8 @@ p1 <- DimPlot(plasmodium.combined, reduction = "umap", group.by = "Sample")
 p2 <- DimPlot(plasmodium.combined, reduction = "umap", label = TRUE, repel = TRUE)
 p3 <- DimPlot(plasmodium.combined, reduction = "umap", group.by = "batch")
 p1+p2+p3
+saveRDS(plasmodium.combined,"plasmodium.combined.with.mca.rds")
+var_genes <- read.csv("~/rohit/kaust_proj/var_gene.csv")
 ```
 
 
