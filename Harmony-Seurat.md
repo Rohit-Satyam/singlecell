@@ -160,6 +160,72 @@ table(m>1)
 
 #FALSE  TRUE 
  #88 13525 
+
+ var_mat = (plasmodium.combined@assays$RNA)[common,]>0
+ 
+ dim(var_mat)
+ 
+ #dim(var_mat)
+#[1]    44 24626
+
+table(colSums(var_mat))
+
+#    0     1     2     3     4     5     6     7     8     9    10    11    12    14 
+#11013 10189  2326   626   250   115    58    21    13     5     4     4     1     1 
+
+#vector with cells containing more than 1 var gene
+vv = c( sum( (colSums(var_mat)>1)[which(plasmodium.combined$Sample=="16R")]),
+sum( (colSums(var_mat)>1)[which(plasmodium.combined$Sample=="16D")]),
+sum( (colSums(var_mat)>1)[which(plasmodium.combined$Sample=="40R")]),
+sum( (colSums(var_mat)>1)[which(plasmodium.combined$Sample=="40D")]) )
+
+vv
+
+
+boxplot(
+  colSums(var_mat)[which( colSums(var_mat)>0 & plasmodium.combined$Sample=="16R")],
+  colSums(var_mat)[which( colSums(var_mat)>0 & plasmodium.combined$Sample=="16D")],
+  colSums(var_mat)[which( colSums(var_mat)>0 & plasmodium.combined$Sample=="40R")],
+  colSums(var_mat)[which( colSums(var_mat)>0 & plasmodium.combined$Sample=="40D")]
+)
+
+# proportion of cells expressing more than 1 var gene increases with hpi and in mutation
+
+vv_var0=
+  cbind(
+    table((colSums(var_mat)>0)[which(plasmodium.combined$Sample=="16R")]),
+    table((colSums(var_mat)>0)[which(plasmodium.combined$Sample=="16D")]),
+    table((colSums(var_mat)>0)[which(plasmodium.combined$Sample=="40R")]),
+    table((colSums(var_mat)>0)[which(plasmodium.combined$Sample=="40D")])
+  )
+
+for(i in 1:ncol(vv_var0))
+  vv_var0[,i]=vv_var0[,i]/sum(vv_var0[,i])
+
+barplot(vv_var0,names.arg = c("16R","16D","40R","40D"),ylab="% cells expressing var genes")
+
+vv_var1more=
+  cbind(
+  table(colSums(var_mat)[which( colSums(var_mat)>0 & plasmodium.combined$Sample=="16R")]>1),
+  table(colSums(var_mat)[which( colSums(var_mat)>0 & plasmodium.combined$Sample=="16D")]>1),
+  table(colSums(var_mat)[which( colSums(var_mat)>0 & plasmodium.combined$Sample=="40R")]>1),
+  table(colSums(var_mat)[which( colSums(var_mat)>0 & plasmodium.combined$Sample=="40D")]>1)
+)
+
+for(i in 1:ncol(vv_var1more))
+  vv_var1more[,i]=vv_var1more[,i]/sum(vv_var1more[,i])
+
+barplot(vv_var1more,names.arg = c("16R","16D","40R","40D"),ylab="% cells expressing 1+ var genes")
+
+#fisher test on cells with more than 1 var gene in the context of R,D and 16,40
+fisher.test(matrix(vv,nrow = 2,byrow = T))
+# suggests that with later hpi and mutation the #var genes and #cells expressing var genes significantly increases
+
+
+# Conclusion with later hpi lesser proportion of cells express var genes
+# However, at later hpi more number of var genes per cells are expressed
+# At 40 hpi D, both the number of cells expressing var genes and cells expressing more than 1 var genes is greater
+
 ```
 
 
