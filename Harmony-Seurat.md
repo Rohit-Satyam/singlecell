@@ -226,6 +226,12 @@ fisher.test(matrix(vv,nrow = 2,byrow = T))
 # However, at later hpi more number of var genes per cells are expressed
 # At 40 hpi D, both the number of cells expressing var genes and cells expressing more than 1 var genes is greater
 
+## Make Heatmap of the var genes from KAUST
+readr::read_tsv("~/rohit/kaust_proj/kaust_vargene_list.tsv", col_names = TRUE)
+r3 <- kaust_var_genes$`Gene ID`
+common_kaust_var_genes <- intersect(r,r3)
+DoHeatmap(subset_sobj, features = common_kaust_var_genes[1:5],  group.by = "Sample")+theme(axis.text.y = element_text(color="black", size=20))
+
 ```
 
 
