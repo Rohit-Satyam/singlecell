@@ -87,3 +87,4 @@ Demultiplexed FASTQ files with valid sequencing indices are found under the dire
 3. Broad Institute tutorial: https://broadinstitute.github.io/2019_scWorkshop/data-preprocessing.html
 4. https://davetang.org/muse/2018/08/09/getting-started-with-cell-ranger/
 5. https://asap.epfl.ch/home/tutorial?t=full_pipeline
+6. https://broadinstitute.github.io/2019_scWorkshop/correcting-batch-effects.html
