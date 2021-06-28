@@ -5,7 +5,7 @@
 
 
 
-### Installation of CellRanger for rawdata alignment
+##### STEP1: Installation of CellRanger for rawdata alignment
 
 Follow along this [link](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation) to install and setup cellranger pipeline.
 
@@ -68,6 +68,8 @@ Demultiplexed FASTQ files with valid sequencing indices are found under the dire
 ![enter image description here](https://i.imgur.com/YuMcUUr.png)
 
 >FastQ is the most raw form of scRNASeq data you will encounter. All scRNASeq protocols are sequenced with paired-end sequencing. Barcode sequences may occur in one or both reads depending on the protocol employed. However, protocols using unique molecular identifiers (UMIs) will generally contain one read with the cell and UMI barcodes plus adapters but without any transcript sequence. Thus reads will be mapped as if they are single-end sequenced despite actually being paired end.
+
+Note: For P. falciparum project we used the joint index of Human and P.falciparum (Combine their FASTA file and also their respective gtf/gff then index the fasta file). We didn't find too many p.falciparum reads mapping onto human genome (less than 1%). This strategy was used to rule out human RNA contamination. 
 
 
 
