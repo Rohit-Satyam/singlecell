@@ -213,6 +213,7 @@ plotHighestExprs(sce, n=25) + theme(text = element_text(size=14))
 8. https://scrnaseq-course.cog.sanger.ac.uk/website/cleaning-the-expression-matrix.html#expression-qc-reads
 9. https://almutlue.github.io/batch_dataset/pbmc_roche.html
 10. https://rockefelleruniversity.github.io/scRNA-seq/presentations/slides/Session3.html#1
+11. https://gtpb.github.io/ADER18S/
 
 
 
